@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Voronoi Noise/1.0.0": {
+        "runtime": {
+          "Voronoi Noise.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Voronoi Noise/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,15 @@
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\bin\Debug\net9.0-windows\Voronoi Noise.exe
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\bin\Debug\net9.0-windows\Voronoi Noise.deps.json
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\bin\Debug\net9.0-windows\Voronoi Noise.runtimeconfig.json
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\bin\Debug\net9.0-windows\Voronoi Noise.dll
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\bin\Debug\net9.0-windows\Voronoi Noise.pdb
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.AssemblyInfoInputs.cache
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.AssemblyInfo.cs
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.csproj.CoreCompileInputs.cache
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.sourcelink.json
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.dll
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\refint\Voronoi Noise.dll
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.pdb
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\Voronoi Noise.genruntimeconfig.cache
+C:\Users\user1\Documents\C#TestingGrounds\Voronoi Noise\obj\Debug\net9.0-windows\ref\Voronoi Noise.dll
