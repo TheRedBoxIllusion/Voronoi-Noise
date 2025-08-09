@@ -8,18 +8,18 @@ public class ProgramController
 {
     //World defining variables: Set in the valueDefinion() function
     //Frequency increases the density of regions
-    double frequency = 0.1;
     (int width, int height) worldDimensions = (512, 512);
 
-    //Cummulative percentages. The last value always adds up to 100
-    //I think a better way would be to sum together varying frequency voronoi noises, the rarer on top of the less rare
-    //That way, we could control the 'frequency' variable of each and change the size of the veins  
-    (Block ore, int percentage)[] oreComposition =
-    { (new Block(Color.Crimson),60),
-    (new Block(Color.Aquamarine), 26),
-    (new Block(Color.White), 10),
-    (new Block(Color.Black), 1),
-    (new Block(Color.DarkGray), 3)};
+    //An array of each ore, including the percentage composition and the frequency of the voronoi noise
+    //The Block object contains a color to draw and the colors that it can grow in. In actual implementation this shall
+    //be more complex and will instead of referencing colors to grow in, reference block types themselves to remove dependencies. 
+    (Block ore, double percentage, double frequency)[] oreComposition =
+    { (new Block(Color.Black, new List<Color>()), 100, 0.01), //Base block
+    (new Block(Color.FromArgb(150, 150, 150), new List<Color>{Color.Black}), 0.1, 0.06),    
+    (new Block(Color.Crimson, new List<Color>{Color.Black}), 0.1, 0.4),
+    (new Block(Color.DarkGreen, new List<Color>{Color.FromArgb(150, 150, 150)}), 0.05, 0.6)};
+
+    //Percentage determinator: worldDimensions 
     
 
     (int width, int height) screenDimensions = (900, 900);
@@ -28,10 +28,10 @@ public class ProgramController
 
     public void initialiseProgram()
     {
-        WorldContext worldContext = new WorldContext(worldDimensions.width, worldDimensions.height);
+        WorldContext worldContext = new WorldContext(worldDimensions.width, worldDimensions.height, oreComposition);
 
 
-        worldContext.generateWorld(frequency, oreComposition);
+        worldContext.generateWorld(oreComposition);
 
         CustomWindow window = new CustomWindow(worldContext, screenDimensions, false);
 
@@ -81,18 +81,10 @@ public class CustomWindow : Form
         {
             for (int y = 0; y < lowResolutionLengthY; y++)
             {
-                if (inGreyscale)
-                {
-                    int greyscaleValue = (int)(worldContext.getWorldArray()[x, y] * 255);
-                    Color color = Color.FromArgb(greyscaleValue, greyscaleValue, greyscaleValue);
-
-                    lowResolution.SetPixel(x, y, color);
-                    //Used in tandem with changing the noise output. But shows the greyscale noise map
-                }
-                else
-                {
+                
+                
                     lowResolution.SetPixel(x, y, worldContext.getBlockArray()[x, y].color);
-                }
+                
             }
         }
 
@@ -130,58 +122,83 @@ public class CustomWindow : Form
 
 public class WorldContext
 {
-    double[,] worldArray;
+    double[][,] worldArray;
 
     Block[,] blockArray;
 
     int seed;
 
-    public WorldContext(int worldX, int worldY)
+    public WorldContext(int worldX, int worldY, (Block block, double composition, double frequency)[] worldComposition)
     {
-        worldArray = new double[worldX, worldY];
+        worldArray = new double[worldComposition.Length][,];
+        for (int i = 0; i < worldArray.Length; i++)
+        {
+            worldArray[i] = new double[worldX, worldY];
+        }
         blockArray = new Block[worldX, worldY];
     }
 
-    public void generateBlockArray(double[,] worldArray, (Block block, int composition)[] oreComposition)
+    public void generateBlockArray(double[][,] worldArray, (Block block, double composition, double frequency)[] oreComposition)
     {
         //two seperate lists rather than a single tuple list so that the .Find() function can be used
-        List<double> definedVeins = new List<double>();
-        List<Block> definedVeinsBlock = new List<Block>();
-
-        for (int x = 0; x < worldArray.GetLength(0); x++)
+        for (int i = 0; i < worldArray.Length; i++)
         {
-            for (int y = 0; y < worldArray.GetLength(1); y++)
+            List<double> definedVeins = new List<double>();
+            List<Block> definedVeinsBlock = new List<Block>();
+            int numOfVeins = 0;
+            for (int x = 0; x < worldArray[i].GetLength(0); x++)
             {
-                if (!definedVeins.Contains(worldArray[x, y]))
-                {
-                    //Generates a seeded random that will always return the same value for the same value of the world array.
-                    //ie a random number dependent on the closest point
-                    Random random = new Random();
-                    int outputPercentage = (int)Math.Floor((random.NextDouble() * 100));
-                    int cumulatedPercentage = 0;
-                    foreach ((Block block, int composition) ore in oreComposition)
-                    {
-                        if (cumulatedPercentage <= outputPercentage && outputPercentage < ore.composition + cumulatedPercentage)
-                        {
-                            blockArray[x, y] = ore.block;
 
-                            definedVeins.Add(worldArray[x, y]);
-                            definedVeinsBlock.Add(ore.block);
+                for (int y = 0; y < worldArray[i].GetLength(1); y++)
+                {
+                    bool canGrow = false;
+                    if (blockArray[x, y] != null)
+                    {
+                        if (oreComposition[i].block.canGrowIn.Contains(blockArray[x, y].color))
+                        {
+                            canGrow = true;
                         }
-                        cumulatedPercentage += ore.composition;
+                    }
+                    else
+                    {
+                        canGrow = true;
+                     }
+                    if (canGrow)
+                    {
+                        if (!definedVeins.Contains(worldArray[i][x, y]))
+                        {
+                            //Generates a seeded random that will always return the same value for the same value of the world array.
+                            //ie a random number dependent on the closest point
+                            Random random = new Random();
+                            double outputPercentage = random.NextDouble() * 100;
+
+
+                            if (outputPercentage < oreComposition[i].composition)
+                            {
+
+                                blockArray[x, y] = oreComposition[i].block;
+
+                                definedVeins.Add(worldArray[i][x, y]);
+                                definedVeinsBlock.Add(oreComposition[i].block);
+                                numOfVeins++;
+                            }
+
+
+                        }
+                        else
+                        {
+                            //Technically the index will just be the worldArray[x,y] - 1 value, as it is going sequentially,
+                            //But using that is not modification proof
+
+                            int indexOfVein = definedVeins.IndexOf(worldArray[i][x, y]);
+                            blockArray[x, y] = definedVeinsBlock[indexOfVein];
+                        }
                     }
                 }
-                else
-                {
-                    //Technically the index will just be the worldArray[x,y] - 1 value, as it is going sequentially,
-                    //But using that is not modification proof
-                    
-                    int indexOfVein = definedVeins.IndexOf(worldArray[x, y]);
-                    blockArray[x, y] = definedVeinsBlock[indexOfVein];
-                }
+
             }
+            
         }
-        
     }
     
     public void regrowSeed()
@@ -190,7 +207,7 @@ public class WorldContext
         seed = r.Next();
     }
 
-    public double[,] getWorldArray()
+    public double[][,] getWorldArray()
     {
         return worldArray;
     }
@@ -201,11 +218,14 @@ public class WorldContext
     }
 
 
-    public void generateWorld(double frequency, (Block ore, int composition)[] oreComposition)
+    public void generateWorld((Block ore, double composition, double frequency)[] oreComposition)
     {
         VoronoiNoise vn = new VoronoiNoise();
 
-        worldArray = vn.generateNoise(worldArray, frequency);
+        for (int i = 0; i < worldArray.Length; i++)
+        {
+            worldArray[i] = vn.generateNoise((worldArray[i].GetLength(0), worldArray[i].GetLength(0)), oreComposition[i].frequency);
+        }
 
         regrowSeed();
         generateBlockArray(worldArray, oreComposition);
@@ -215,21 +235,23 @@ public class WorldContext
 public class Block
 {
     public Color color;
-    public Block(Color color)
+    public List<Color> canGrowIn;
+    public Block(Color color, List<Color> canGrowIn)
     {
         this.color = color;
-     } 
+        this.canGrowIn = canGrowIn;
+    } 
 }
 
 public class VoronoiNoise
 {
     //Noise generated by positioning a point inside of a grid, then going through each pixel and determining which point is closest
 
-    public double[,] generateNoise(double[,] worldArray, double frequency)
+    public double[,] generateNoise((int width, int height)worldDimensions, double frequency)
     {
-        double[,] noiseOutput = new double[worldArray.GetLength(0), worldArray.GetLength(1)];
+        double[,] noiseOutput = new double[worldDimensions.width, worldDimensions.height];
 
-        Vector2[,] unitSquarePoints = distributeRandomPoints(worldArray, frequency);
+        Vector2[,] unitSquarePoints = distributeRandomPoints(worldDimensions, frequency);
 
         for (int x = 0; x < noiseOutput.GetLength(0); x++)
         {
@@ -243,11 +265,11 @@ public class VoronoiNoise
     }
 
 
-    private Vector2[,] distributeRandomPoints(double[,] worldArray, double frequency)
+    private Vector2[,] distributeRandomPoints((int width, int height)worldDimensions, double frequency)
     {
         //Determines the number of unit squares. 1/Frequency represents the number of worldArray coordinates per unit
         //So multiplying the length of the worldArray by the frequency, gives the number of units per array. The +1 ensures no index overflows
-        Vector2[,] unitSquareVectors = new Vector2[(int)Math.Ceiling(worldArray.GetLength(0) * frequency) + 1, (int)Math.Ceiling(worldArray.GetLength(1) * frequency) + 1];
+        Vector2[,] unitSquareVectors = new Vector2[(int)Math.Ceiling(worldDimensions.width * frequency) + 1, (int)Math.Ceiling(worldDimensions.height * frequency) + 1];
 
         for (int x = 0; x < unitSquareVectors.GetLength(0); x++)
         {

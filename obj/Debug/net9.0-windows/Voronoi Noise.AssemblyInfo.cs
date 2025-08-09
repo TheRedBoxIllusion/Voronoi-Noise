@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Voronoi Noise")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f61d3e03881d49826d382bacd90a729530b097c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e20bcd79292c11024bf39aed9d8cdb808acb2ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("Voronoi Noise")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Voronoi Noise")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
